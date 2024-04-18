@@ -1,0 +1,15 @@
+Metadata-Version: 2.1
+Name: order-processing-library
+Version: 0.0.1
+Summary: My package is used to handle the basic discount, tax & shipping calculation
+Home-page: 
+Author: Rajaram Jagadeeswaran
+Author-email: x22239243@student.ncirl.ie
+License: MIT
+Keywords: discount
+Classifier: Development status :: 5 - PROD
+Classifier: Indended Audience :: Education
+Classifier: Operating System :: Microsoft :: Windows :: Windows 11
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+License-File: LICENSE

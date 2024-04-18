@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Placed</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .container {
+            text-align: center;
+            margin-top: 100px;
+            max-width: 5000px; 
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        h1 {
+            color: #007bff;
+        }
+
+        img {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            margin-top: 50px;
+        }
+
+        .hide {
+            display: none;
+        }
+
+        .show {
+            display: block;
+        }
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">A-MAX</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item {% if request.path == '/' %} active {% endif %}">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                <li class="nav-item {% if request.path == '/signup' %} active {% endif %}">
+                    <a class="nav-link" href="/signup">Signup</a>
+                </li>
+                <li class="nav-item {% if request.path == '/login' %} active {% endif %}">
+                    <a class="nav-link" href="/logout">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 mt-5">
+                <div class="card">
+                    <div class="card-header">
+                        <h1 class="text-center">Order Placed</h1>
+                    </div>
+                    <div class="card-body">
+                        <h3>Your Order Details:</h3>
+
+                        {% for order in order_items %}
+                        <div>
+                            <h4>Order Reference: #{{ order.order_id }}</h4>
+                            <table class="table">
+                                <tr>
+                                    <th>Total Order Price</th>
+                                    <td>€{{ order.checkout_price }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Delivery Address</th>
+                                    <td>{{ order.delivery_address }}</td>
+                                </tr>
+                            </table>
+
+                            <h3>Order Items:</h3>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Product Name</th>
+                                        <th>Price</th>
+                                        <th>Quantity</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in order.cart_items %}
+                                    <tr>
+                                        <td>{{ item.item.name }}</td>
+                                        <td>€{{ item.item.price }}</td>
+                                        <td>{{ item.item.quantity }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+
+                            <h3>Order Details:</h3>
+                            <table class="table">
+                                <tr>
+                                    <th>Discounted Price</th>
+                                    <td>€{{ order.discount_price }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Tax</th>
+                                    <td>€{{ order.tax }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Shipping Cost</th>
+                                    <td>€{{ order.shipping_cost }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Net Total</th>
+                                    <td>€{{ order.net_total }}</td>
+                                </tr>
+                            </table>
+                            <p>Your order has been placed successfully. You will receive the email with the
+                                reference number. Please show that, pay the money & collect your products at your
+                                nearby shops. Thank you for shopping with us!</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>

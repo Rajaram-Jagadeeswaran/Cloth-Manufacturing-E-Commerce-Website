@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Home</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .container {
+            text-align: center;
+            margin-top: 100px;
+        }
+
+        h1 {
+            color: #007bff;
+        }
+
+        .drink-carousel {
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .cloth-images {
+            display: flex;
+            transition: transform 1s ease-in-out;
+            justify-content: center;
+            align-items: center;
+            height: 600px;
+            position: relative;
+        }
+
+        .cloth-images img {
+            max-width: 70%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease-in-out;
+        }
+        .cloth-images img:hover {
+            transform: scale(1.1);
+        }
+
+        .slide-button {
+            cursor: pointer;
+            font-size: 24px;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.5);
+            border: none;
+            padding: 10px;
+            position: absolute;
+            top: 50%;
+            transform: translateY(10%);
+        }
+
+        .prev {
+            left: 600px;
+        }
+
+        .next {
+            right: 600px;
+        }
+
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">A-MAX</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item {% if request.path == '/' %} active {% endif %}">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                <li class="nav-item {% if request.path == '/signup' %} active {% endif %}">
+                    <a class="nav-link" href="/signup">Signup</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        {% if session.loggedin %}
+            <h1>Welcome, {{ session.name }}!</h1>
+            <a href="{{ url_for('logout') }}" class="btn btn-primary">Logout</a>
+        {% else %}
+            <h1>Welcome to A-MAX!</h1>
+            <a href="{{ url_for('login') }}" class="btn btn-primary">Login</a>
+        {% endif %}
+    </div>
+
+    <div class="cloth-carousel">
+        <div class="cloth-images">
+            <button class="slide-button prev" onclick="prevSlide()">&#8249;</button>
+            <img src="/static/image1.png" alt="Cool Drink 1">
+            <img src="/static/image2.png" alt="Cool Drink 2">
+            <img src="/static/image6.png" alt="Cool Drink 3">
+            <button class="slide-button next" onclick="nextSlide()">&#8250;</button>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        let slideIndex = 0;
+
+        function showSlides() {
+            const slides = document.querySelectorAll('.cloth-images img');
+            if (slideIndex >= slides.length) {
+                slideIndex = 0;
+            }
+            if (slideIndex < 0) {
+                slideIndex = slides.length - 1;
+            }
+            slides.forEach((slide) => {
+                slide.style.display = 'none';
+            });
+            slides[slideIndex].style.display = 'block';
+        }
+
+        function nextSlide() {
+            slideIndex++;
+            showSlides();
+        }
+
+        function prevSlide() {
+            slideIndex--;
+            showSlides();
+        }
+
+        showSlides();
+    </script>
+</body>
+
+</html>

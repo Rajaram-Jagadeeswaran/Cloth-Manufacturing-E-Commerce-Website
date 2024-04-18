@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Product</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 50px;
+        }
+        h1 {
+            text-align: center;
+            color: #007bff;
+            margin-bottom: 30px;
+        }
+        form {
+            margin-top: 100px;
+            max-width: 1000px; 
+            margin-left: auto;
+            margin-right: auto;
+            background: #fff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        form p {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+        input[type="number"],
+        input[type="text"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Add Product</h1>
+    <form method="POST" enctype="multipart/form-data" action="add_product">
+
+        <p>
+            <label for="name">Product Name:</label><br>
+            <input type="text" id="name" name="name"><br>
+        </p>
+        <p>
+            <label for="name">Product Discription:</label><br>
+            <input type="text" id="product_discription" name="product_discription"><br>
+        </p>
+        <p>
+            <label for="price">Price:</label><br>
+            <input type="number" id="price" name="price"><br>
+        </p>
+        <p>
+            <label for="quantity">Quantity:</label><br>
+            <input type="number" id="quantity" name="quantity"><br>
+        </p>
+        <p>
+            <label for="image">Image:</label><br>
+            <input type="file" id="image" name="image"><br>
+        </p>
+        <p>
+            <button type="submit" onclick="callAPI(document.getElementById('name').value,document.getElementById('price').value,document.getElementById('quantity').value)">Submit</button>
+        </p>
+    </form>
+</body>
+</html>

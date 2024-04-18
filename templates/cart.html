@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .delete-icon {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+        }
+    </style>
+</head>
+
+<body class="bg-light">
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">A-MAX</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item {% if request.path == '/' %} active {% endif %}">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                <li class="nav-item {% if request.path == '/login' %} active {% endif %}">
+                    <a class="nav-link" href="/logout">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h1 class="text-center">My Cart</h1>
+                    </div>
+                    <div class="card-body">
+    
+                        {% if cart_items %}
+                            {% for item in cart_items %}
+                            <div class="card mb-4 position-relative">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ item['cart_item']['name'] }}</h5>
+                                    <p class="card-text">Product ID: {{ item['cart_item']['product_id'] }}</p>
+                                    <p class="card-text">Price: €{{ item['cart_item']['price'] }}</p>
+                                    <p class="card-text">Quantity: {{ item['cart_item']['quantity'] }}</p>
+                                </div>
+                                <form method="POST" action="/remove_from_cart" class="delete-icon">
+                                    <input type="hidden" name="cart_item_id" value="{{ item['cart_item_id'] }}">
+                                    <!-- Use the Font Awesome delete icon -->
+                                    <button type="submit" class="btn btn-link text-danger" title="Remove from Cart">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
+                            </div>
+                            {% endfor %}
+    
+                            <div class="form-group row">
+                                <h5 class="col-sm-3 col-form-label">Total: <span id="totalAmount">€{{ total }}</span></h5>
+                            </div>                            
+    
+                            <div class="text-center">
+                                <div class="form-group">
+                                    <input type="hidden" id="orderTotalInput" value="{{ total }}">
+                                    <h5 for="couponCode">Coupon Code</h5>
+                                    <input type="text" class="form-control" id="couponCode" placeholder="Enter your coupon code to get the discount">
+                                </div>
+                                <button type="button" class="btn btn-primary" id="applyCouponBtn">Apply Coupon</button>
+                                <p id="couponMessage" class="text-danger"></p>
+                            </div>                   
+
+                            <div class="form-group row">
+                                <h5 class="col-sm-3 col-form-label">Discounted Total: <span id="discountedAmount"></span> </h5>
+                            </div>
+                            <div class="text-right"> 
+                                <div>
+                                    <button type="button" class="btn btn-primary" id="getLocationBtn">Get My Location</button>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <form method="POST" action="/place_order">
+                                    <div class="form-group">
+                                        <h5 for="deliveryAddress">Delivery Address</h5>
+                                        <input type="text" class="form-control" id="deliveryAddress" name="delivery_address" required>
+                                    </div>
+                                    <input type="hidden" id="checkoutPrice" name="checkout_price" required>
+                                    <button type="submit" class="btn btn-primary">Place Order</button>
+                                </form>
+                            </div>
+                        {% else %}
+                            <p class="text-center">No items added to the cart.</p>
+                        {% endif %}
+    
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        // Function to update the Discounted Total field with the new total
+        function updateDiscountedTotal(new_Total) {
+            var discountedAmountSpan = document.getElementById("discountedAmount");
+            console.log('dos==isc:', new_Total);
+            if (discountedAmountSpan) {
+                discountedAmountSpan.textContent = "€" + new_Total.toFixed(2); // Assuming newTotal is a Decimal or float
+            }
+        }
+    
+        // Function to update the checkout price value in the hidden input field
+        function updateCheckoutPrice(newTotal) {
+            var checkoutPriceInput = document.getElementById("checkoutPrice");
+            if (checkoutPriceInput) {
+                checkoutPriceInput.value = newTotal.toFixed(2); // Assuming newTotal is a Decimal or float
+            }
+        }
+    
+        // Add event listener to handle form submission
+        document.getElementById("applyCouponBtn").addEventListener("click", function() {
+            var couponCode = document.getElementById("couponCode").value;
+            var orderTotal = document.getElementById("orderTotalInput").value;
+            
+            // Create a new FormData object
+            var formData = new FormData();
+            formData.append("coupon_code", couponCode);
+            formData.append("order_total", orderTotal);
+            
+            // Create a new XMLHttpRequest object
+            var xhr = new XMLHttpRequest();
+            
+            // Define what happens on successful data submission
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    var response = JSON.parse(xhr.responseText);
+                    console.log(response);
+                    if (response.success) {
+                        document.getElementById("couponMessage").textContent = "Coupon applied successfully.";
+                        updateDiscountedTotal(response.new_total); // Call the updateDiscountedTotal function with the new total
+                        updateCheckoutPrice(response.new_total); // Update the checkout price value
+                    } else {
+                        document.getElementById("couponMessage").textContent = "Invalid coupon";
+                    }
+                } else {
+                    document.getElementById("couponMessage").textContent = "Error applying coupon.";
+                }
+            };
+            
+            // Define what happens in case of an error
+            xhr.onerror = function() {
+                document.getElementById("couponMessage").textContent = "Error applying coupon.";
+            };
+            
+            // Set up the request
+            xhr.open("POST", "/apply_coupon");
+            
+            // Send the form data
+            xhr.send(formData);
+        });
+    </script>
+    <script>
+        window.addEventListener('DOMContentLoaded', function() {
+            var totalInput = document.getElementById('orderTotalInput');
+            var checkoutPriceInput = document.getElementById('checkoutPrice');
+            var newTotal = "{{ new_Total }}";
+    
+            if (newTotal === null || newTotal === '') {
+                checkoutPriceInput.value = totalInput.value;
+            } else {
+                checkoutPriceInput.value = newTotal;
+            }
+        });
+    </script>   
+    <script>
+        document.getElementById("getLocationBtn").addEventListener("click", function() {
+            // Get latitude and longitude using browser's geolocation API
+            navigator.geolocation.getCurrentPosition(function(position) {
+                const latitude = position.coords.latitude;
+                const longitude = position.coords.longitude;
+                console.log(latitude)
+                console.log(longitude)
+                // Send latitude and longitude to the server to fetch address
+                fetch('/get_location_address', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: `latitude=${latitude}&longitude=${longitude}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update UI with the retrieved address
+                        document.getElementById("deliveryAddress").value = data.address;
+                    } else {
+                        console.error('Error:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            });
+        });
+    </script>
+    
+</body>
+
+</html>

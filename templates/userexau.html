@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Sign Up</title>
+
+    <style>
+        body {
+
+            font-family: 'Arial', sans-serif;
+
+            background-color: #1e6903;
+
+            color: #000000;
+
+            margin: 0;
+
+            padding: 20px;
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            min-height: 100vh;
+
+        }
+
+        form {
+
+            width: 300px;
+
+            max-height: 100%;
+
+            overflow-y: auto;
+
+            background-color: #ffffff;
+
+            padding: 20px;
+
+            border-radius: 8px;
+
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+        }
+
+        label {
+
+            display: block;
+
+            margin-bottom: 8px;
+
+            color: #1e6903;
+
+            font-weight: bold;
+
+        }
+
+        input {
+
+            width: 100%;
+
+            padding: 10px;
+
+            margin-bottom: 16px;
+
+            border: 1px solid #000000;
+
+            box-sizing: border-box;
+
+            border-radius: 5px;
+
+            font-size: 16px;
+
+        }
+
+        button {
+
+            background-color: #1e6903;
+
+            color: #ffffff;
+
+            padding: 10px 20px;
+
+            border: none;
+
+            border-radius: 5px;
+
+            font-size: 16px;
+
+            cursor: pointer;
+
+        }
+
+        button:hover {
+
+            background-color: #165602;
+
+        }
+
+        a {
+
+            color: #000000;
+
+            text-decoration: none;
+
+        }
+
+        a:hover {
+
+            text-decoration: underline;
+
+        }
+
+        .signup-link {
+
+            margin-top: 16px;
+
+            text-align: center;
+
+        }
+
+        .modal {
+
+            display: none;
+
+            position: fixed;
+
+            z-index: 1;
+
+            left: 0;
+
+            top: 0;
+
+            width: 100%;
+
+            height: 100%;
+
+            overflow: auto;
+
+            background-color: rgba(0, 0, 0, 0.4);
+
+            padding-top: 60px;
+
+        }
+
+        .modal-content {
+
+            background-color: #fefefe;
+
+            margin: 5% auto;
+
+            padding: 20px;
+
+            border: 1px solid #888;
+
+            width: 80%;
+
+        }
+
+        .close {
+
+            color: #aaa;
+
+            float: right;
+
+            font-size: 28px;
+
+            font-weight: bold;
+
+        }
+
+        .close:hover,
+
+        .close:focus {
+
+            color: black;
+
+            text-decoration: none;
+
+            cursor: pointer;
+
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+        {{ form.first_name.label_tag }}
+
+        {{ form.first_name }}
+
+        <p class="error-message">{{ form.first_name.errors }}</p>
+
+        {{ form.last_name.label_tag }}
+
+        {{ form.last_name }}
+
+        <p class="error-message">{{ form.last_name.errors }}</p>
+
+        {{ form.username.label_tag }}
+
+        {{ form.username }}
+
+        <p class="error-message">{{ form.username.errors }}</p>
+
+        <button type="button" class="generate-username-button" onclick="openModal()">Generate Random Username</button>
+
+        {{ form.email.label_tag }}
+
+        {{ form.email }}
+
+        <p class="error-message">{{ form.email.errors }}</p>
+
+        {{ form.password1.label_tag }}
+
+        {{ form.password1 }}
+
+        <p class="error-message">{{ form.password1.errors }}</p>
+
+        {{ form.password2.label_tag }}
+
+        {{ form.password2 }}
+
+        <p class="error-message">{{ form.password2.errors }}</p>
+
+        <div>
+
+            <button type="submit">Sign Up</button>
+
+        </div>
+
+    </form>
+
+    <p></p>
+
+    <div class="signup-link">
+
+        If you have an account <a href="{% url 'sign_in' %}">Sign In</a>
+
+    </div>
+
+    <!-- Modal -->
+
+    <div id="myModal" class="modal">
+
+        <div class="modal-content">
+
+            <span class="close" onclick="closeModal()">&times;</span>
+
+            <h2>Generated Username</h2>
+
+            <p id="modal-username"></p>
+
+            <!-- Copy button -->
+
+            <button type="button" onclick="copyUsername()">Copy Username</button>
+
+        </div>
+
+    </div>
+
+    <script>
+
+        function openModal() {
+
+            document.getElementById("myModal").style.display = "block";
+
+            var firstName = document.getElementById('id_first_name').value;
+
+            var lastName = document.getElementById('id_last_name').value;
+
+            console.log(firstName);
+
+            // Check if both first name and last name are provided
+
+            if (firstName.trim() === '' || lastName.trim() === '') {
+
+                alert('Please provide both first name and last name.');
+
+                return;
+
+            }
+
+            fetch('https://vi6vw30ana.execute-api.eu-west-1.amazonaws.com/dev', {
+
+                method: 'POST',
+
+                headers: {
+
+                    'Content-Type': 'application/json'
+
+                },
+
+                body: JSON.stringify({
+
+                    first_name: firstName,
+
+                    last_name: lastName
+
+                })
+
+            })
+
+                .then(response => response.json())
+
+                .then(data => {
+
+                    document.getElementById('modal-username').innerText = data.username;
+
+                })
+
+                .catch(error => {
+
+                    console.error('Error:', error);
+
+                    // Handle error
+
+                    alert('Failed to generate username. Please try again later.');
+
+                });
+
+        }
+
+        function closeModal() {
+
+            document.getElementById("myModal").style.display = "none";
+
+        }
+
+        // Function to copy username to clipboard
+
+        function copyUsername() {
+
+            var username = document.getElementById("modal-username").innerText;
+
+            navigator.clipboard.writeText(username)
+
+                .then(() => {
+
+                    alert("Username copied to clipboard: " + username);
+
+                })
+
+                .catch(err => {
+
+                    console.error('Error:', err);
+
+                    alert('Failed to copy username to clipboard.');
+
+                });
+
+        }
+
+    </script>
+
+</body>
+
+</html>
