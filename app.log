@@ -1,0 +1,12 @@
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 800-290-215
+INFO:werkzeug:127.0.0.1 - - [30/Oct/2023 16:22:00] "GET /add_product HTTP/1.1" 200 -
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 800-290-215
+INFO:werkzeug:127.0.0.1 - - [30/Oct/2023 16:22:48] "GET /product HTTP/1.1" 200 -
+INFO:werkzeug: * Detected change in 'C:\\Users\\rajar\\OneDrive\\Desktop\\simple_project\\application.py', reloading
+INFO:werkzeug: * Restarting with stat
