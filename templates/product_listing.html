@@ -36,6 +36,9 @@
             position: absolute;
             bottom: 0;
             right: 0;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 10px;
         }
     </style>
 </head>
@@ -76,12 +79,46 @@
                 <!-- Review button container -->
                 <div class="review-container">
                     <!-- Comment icon for View Reviews button -->
-                    <button class="review-btn btn btn-primary" data-product-id="{{ product.product_id }}"><i class="fa fa-comment"></i></button>
+                    <button class="review-btn btn btn-primary" data-toggle="modal" data-target="#reviewModal" data-product-id="{{ product.product_id }}">Review</button>
                 </div>
             </li>
             {% endfor %}
         </ul>
     </div>  
+    <!-- Modal for reviews -->
+    <div class="modal fade" id="reviewModal" tabindex="-1" role="dialog" aria-labelledby="reviewModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="reviewModalLabel">Product Reviews</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Users Review</th>
+                                </tr>
+                            </thead>
+                            <tbody id="existingReviews">
+                                <!-- Existing reviews will be appended here dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <form id="addReviewForm">
+                        <div class="form-group">
+                            <label for="reviewContent">Add Your Review:</label>
+                            <textarea class="form-control" id="reviewContent" rows="3" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit Review</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
     
     <div class="modal" id="successModal" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
@@ -127,48 +164,19 @@
             $("#successModal").modal('show');  // Show the success modal on page load
         });
     </script>
-    <!-- <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const reviewButtons = document.querySelectorAll('.review-btn');
-            reviewButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const rid = this.getAttribute('data-product-id');
-                    const reviewWindow = window.open('', '_blank', 'width=600,height=400');
-                    reviewWindow.document.write(`<h2>Reviews for Product ID: ${rid}</h2>`);
-                    // You can fetch existing reviews and display them here
-                    reviewWindow.document.write(`<p>Existing reviews go here</p>`);
-                    // Form to add new review
-                    reviewWindow.document.write(`
-                        <form class="add-review-form" method="POST" action="/product_reviews">
-                            <input type="hidden" name="product_id" value="${rid}">
-                            <textarea name="review_content" placeholder="Write your review here"></textarea>
-                            <button type="submit" class="btn btn-primary">Submit Review</button>
-                        </form>
-                    `);
-                });
-            });
-        });
-    </script>
-
+    
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            const reviewButtons = document.querySelectorAll('.review-btn');
-            reviewButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const rid = this.getAttribute('data-product-id');
-                    const reviewDialog = document.getElementById(`review-dialog-${rid}`);
-                    fetchReviews(rid, reviewDialog);
-                    reviewDialog.style.display = 'block';
-                });
-            });
+            const reviewModal = document.getElementById('reviewModal');
+            const existingReviewsList = document.getElementById('existingReviews');
+            const addReviewForm = document.getElementById('addReviewForm');
     
             // Function to fetch existing reviews
-            function fetchReviews(rid, reviewDialog) {
-                const url = `/product_reviews?product_id=${rid}`;
+            function fetchReviews(rid) {
+                const url = `/product_reviews?rid=${rid}`;
                 fetch(url)
                 .then(response => response.json())
                 .then(reviews => {
-                    const existingReviewsList = reviewDialog.querySelector('.existing-reviews');
                     existingReviewsList.innerHTML = ''; // Clear existing reviews
                     reviews.forEach(review => {
                         const li = document.createElement('li');
@@ -179,93 +187,25 @@
                 .catch(error => console.error('Error fetching reviews:', error));
             }
     
-            // Submit review form
-            document.addEventListener('submit', function(event) {
-                event.preventDefault();
-                if (event.target.classList.contains('add-review-form')) {
-                    const formData = new FormData(event.target);
-                    const rid = formData.get('product_id');
-                    const reviewContent = formData.get('review_content');
-                    submitReview(rid, reviewContent);
-                }
-            });
-    
-            // Function to submit a new review
-            function submitReview(rid, reviewContent) {
-                const url = '/product_reviews';
-                const data = {
-                    product_id: rid,
-                    content: reviewContent
-                };
-                fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Review submitted successfully
-                        // You can optionally update the UI or display a message
-                    } else {
-                        console.error('Failed to submit review:', data.error);
-                    }
-                })
-                .catch(error => console.error('Error submitting review:', error));
-            }
-        });
-    </script> -->
-    <script>
-                document.addEventListener("DOMContentLoaded", function() {
-            const reviewButtons = document.querySelectorAll('.review-btn');
-            reviewButtons.forEach(button => {
+            // Handle click on review button
+            document.querySelectorAll('.review-btn').forEach(button => {
                 button.addEventListener('click', function() {
                     const rid = this.getAttribute('data-product-id');
-                    const reviewWindow = window.open('', '_blank', 'width=600,height=400');
-                    reviewWindow.document.write(`<h2>Reviews for Product ID: ${rid}</h2>`);
-                    fetchReviews(rid, reviewWindow.document.body);
+                    reviewModal.setAttribute('data-product-id', rid); // Set the product ID attribute
+                    fetchReviews(rid);
                 });
             });
-
-            // Function to fetch existing reviews
-            function fetchReviews(rid, container) {
-                const url = `/product_reviews?product_id=${rid}`;
-                fetch(url)
-                .then(response => response.json())
-                .then(reviews => {
-                    const existingReviewsList = document.createElement('ul');
-                    reviews.forEach(review => {
-                        const li = document.createElement('li');
-                        li.textContent = review.content;
-                        existingReviewsList.appendChild(li);
-                    });
-                    container.appendChild(existingReviewsList);
-
-                    // Form to add new review
-                    const form = document.createElement('form');
-                    form.classList.add('add-review-form');
-                    form.addEventListener('submit', function(event) {
-                        event.preventDefault();
-                        const formData = new FormData(form);
-                        const reviewContent = formData.get('review_content');
-                        submitReview(rid, reviewContent);
-                    });
-                    const textarea = document.createElement('textarea');
-                    textarea.setAttribute('name', 'review_content');
-                    textarea.setAttribute('placeholder', 'Write your review here');
-                    const submitButton = document.createElement('button');
-                    submitButton.setAttribute('type', 'submit');
-                    submitButton.classList.add('btn', 'btn-primary');
-                    submitButton.textContent = 'Submit Review';
-                    form.appendChild(textarea);
-                    form.appendChild(submitButton);
-                    container.appendChild(form);
-                })
-                .catch(error => console.error('Error fetching reviews:', error));
-            }
-
+    
+            // Handle form submission to add new review
+            addReviewForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+                const rid = reviewModal.getAttribute('data-product-id');
+                const reviewContent = document.getElementById('reviewContent').value;
+                const application = 'A-Max';
+                const user_id = '{{ user_id }}';
+                submitReview(rid, reviewContent, application, user_id);
+            });
+    
             // Function to submit a new review
             function submitReview(rid, reviewContent, application, user_id) {
                 const url = '/product_reviews';
@@ -286,7 +226,8 @@
                 .then(data => {
                     if (data.success) {
                         // Review submitted successfully
-                        // You can optionally update the UI or display a message
+                        fetchReviews(rid); // Refresh reviews list
+                        $('#reviewModal').modal('hide'); // Close the modal
                     } else {
                         console.error('Failed to submit review:', data.error);
                     }
@@ -295,6 +236,7 @@
             }
         });
     </script>
+    
 </body>
 
 </html>

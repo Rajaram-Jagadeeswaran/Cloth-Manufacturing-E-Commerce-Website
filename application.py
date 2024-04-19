@@ -271,21 +271,22 @@ def product_reviews():
     if request.method == 'GET':
         # Get reviews for a specific product
         rid = request.args.get('rid')
-        application = 'A=Max'
-        user_id = get_user_id_from_database()  # Assuming this function retrieves the user_id
-        reviews = get_reviews_from_api(rid, application, user_id)
+        reviews = get_reviews_from_api(rid)
         return jsonify(reviews)
     elif request.method == 'POST':
         # Submit a new review
         data = request.json
+        user_id = get_user_id_from_database()  # Assuming this function retrieves the user_id
+        data['user_id'] = user_id  # Add user_id to the data dictionary
+        print(data)
         response = submit_review_to_api(data)
         if response.status_code == 201:
             return jsonify({'success': True})
         else:
             return jsonify({'success': False, 'error': response.text})
 
-def get_reviews_from_api(rid, application, user_id):
-    response = requests.get(REVIEW_API, params={'rid': rid, 'application': application, 'user_id': user_id})
+def get_reviews_from_api(rid):
+    response = requests.get(REVIEW_API, params={'application': 'A-Max', 'rid': rid})
     if response.status_code == 200:
         return response.json()
     else:
